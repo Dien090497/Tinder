@@ -29,17 +29,24 @@ export const styles = StyleSheet.create({
     padding:5,
     top: 10,
     position: 'absolute',
-    borderRadius: 10
+    borderRadius: 10,
+    marginTop:40
   },
   textLike:{
     left: 10,
     color: '#32CD32',
     borderColor: '#32CD32',
+    transform: [
+      { rotate: '-20deg'},
+    ],
   },
   textNope:{
     borderColor: 'red',
     right: 10,
     color: 'red',
+    transform: [
+      { rotate: '20deg'},
+    ],
   },
   viewInCard:{
     position: 'absolute',

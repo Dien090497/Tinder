@@ -64,45 +64,49 @@ export default function SwipeDeck() {
   ]
 
   const swipeRight = () => {
-    Animated.spring(animatedValue, {
+    Animated.timing(animatedValue, {
       toValue: {
         x: windowWidth * 2,
         y: 0,
+        duration: 1000,
       },
       useNativeDriver: false,
     }).start(() => {
+      setIndexImage(0)
       animatedValue.setValue({ x: 0, y: 0 });
       setCurrentCardIndex(prevCardIndex => prevCardIndex + 1);
     });
   };
 
   const swipeLeft = () => {
-    Animated.spring(animatedValue, {
+    Animated.timing(animatedValue, {
       toValue: {
         x: -windowWidth * 2,
         y: 0,
+        duration: 1000,
       },
       useNativeDriver: false,
     }).start(() => {
+      setIndexImage(0)
       animatedValue.setValue({ x: 0, y: 0 });
       setCurrentCardIndex(prevCardIndex => prevCardIndex + 1);
-      // setIndexImage(0)
     });
   };
-  //
-  // const swipeTop = () => {
-  //   Animated.timing(animatedValue, {
-  //     toValue: {
-  //       x: 0,
-  //       y: -windowHeight*2,
-  //     },
-  //     useNativeDriver: false,
-  //   }).start(() => {
-  //     animatedValue.setValue({ x: 0, y: 0 });
-  //     setCurrentCardIndex(prevCardIndex => prevCardIndex + 1);
-  //     // setIndexImage(0)
-  //   });
-  // };
+
+  const swipeTop = () => {
+    Animated.timing(animatedValue, {
+      toValue: {
+        x: 0,
+        y: -windowHeight*2,
+        duration: 1000,
+      },
+      useNativeDriver: false,
+    }).start(() => {
+      setIndexImage(0)
+      animatedValue.setValue({ x: 0, y: 0 });
+      setCurrentCardIndex(prevCardIndex => prevCardIndex + 1);
+    });
+  };
 
   const resetPosition = () => {
     Animated.timing(animatedValue, {
@@ -125,6 +129,8 @@ export default function SwipeDeck() {
           swipeRight();
         } else if (gesture.dx < -windowWidth * 0.25) {
           swipeLeft();
+        }else if(gesture.dy <= -windowWidth * 0.25){
+          swipeTop()
         } else {
           resetPosition();
         }
@@ -149,6 +155,7 @@ export default function SwipeDeck() {
         let cardAnimationStyle = {};
         let likeTextAnimation = {};
         let nopeTextAnimation = {};
+        let actionNope = {};
         const isActiveCard = i === currentCardIndex;
         if (isActiveCard) {
           cardAnimationStyle = {
@@ -156,8 +163,8 @@ export default function SwipeDeck() {
               { translateX: animatedValue.x },
               {
                 translateY: animatedValue.y.interpolate({
-                  inputRange: [-windowHeight * 0.035, windowHeight * 0.035],
-                  outputRange: [-windowHeight * 0.035, windowHeight * 0.035],
+                  inputRange: [-windowHeight * 5, windowHeight * 5],
+                  outputRange: [-windowHeight * 5, windowHeight * 5],
                   extrapolate: "clamp",
                 }),
               },
@@ -193,21 +200,95 @@ export default function SwipeDeck() {
             {isActiveCard &&
               <Animated.Text style={[styles.textImage, styles.textNope, nopeTextAnimation]}>NOPE</Animated.Text>
             }
+            <Animated.View style={styles.viewInCard}>
+              <View style={{height: 3, flexDirection: 'row'}}>
+                {obj.avatar.length > 1 && obj.avatar.map((img, index)=>{
+                  return(<View key={index} style={{flex:1, backgroundColor: indexImage===index ? 'white': 'gray', borderRadius: 2, marginHorizontal: 2}}/>)
+                })}
+              </View>
+              <View style={{flex:1, flexDirection: 'row'}}>
+                <Animated.View style={{flex:1}} onStartShouldSetResponder={prevImage}/>
+                <Animated.View style={{flex:1}} onStartShouldSetResponder={nextImage}/>
+              </View>
+              <Animated.View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.txtName}>{obj.name}</Text>
+                <Text style={styles.txtAge}>{obj.age}</Text>
+              </Animated.View>
+              <Animated.View>
+                <Text>{obj.desc}</Text>
+              </Animated.View>
+              <Animated.View style={styles.viewActionCard}>
+                <Pressable style={[styles.itemAction, styles.itemAction1,{borderColor: 'white', backgroundColor: isPressReload? 'white': 'rgba(0,0,0,0)'}]}
+                                  onPressOut={()=>{
+                                    setIsPressReload(false)
+                                  }}
+                                  onPressIn={()=>{
+                                    setIsPressReload(true)
+                                  }}
+                >
+                  <MaterialCommunityIcons name={'reload'} size={30} color={!isPressReload? 'white': 'rgba(0,0,0,1)'}/>
+                </Pressable>
+                <Pressable style={[styles.itemAction, styles.itemAction2, {borderColor: Colors.mainColor, backgroundColor: isPressX? Colors.mainColor : 'rgba(0,0,0,0)'}]}
+                                  onPressOut={()=>{
+                                    setIsPressX(false)
+                                    swipeLeft()
+                                  }}
+                                  onPressIn={()=>{
+                                    setIsPressX(true)
+                                  }}
+                >
+                  <Feather name={'x'} size={30} color={isPressX ? 'white' : Colors.mainColor}/>
+                </Pressable>
+                <Pressable style={[styles.itemAction, styles.itemAction1, {borderColor: Colors.blue, backgroundColor: isPressStar? Colors.blue : 'rgba(0,0,0,0)'}]}
+                                  onPressOut={()=>{
+                                    setIsPressStar(false)
+                                    swipeTop()
+                                  }}
+                                  onPressIn={()=>{
+                                    setIsPressStar(true)
+                                  }}
+                >
+                  <Entypo name={'star'} size={30} color={!isPressStar? Colors.blue : 'white'}/>
+                </Pressable>
+                <Pressable style={[styles.itemAction, styles.itemAction2, {borderColor: Colors.green, backgroundColor: isPressLike? Colors.green : 'rgba(0,0,0,0)'}]}
+                           onPressOut={()=>{
+                             setIsPressLike(false)
+                             swipeRight()
+                           }}
+                           onPressIn={()=>{
+                             setIsPressLike(true)
+                           }}
+                >
+                  <Entypo name={'heart'} size={30} color={!isPressLike? Colors.green : 'white'}/>
+                </Pressable>
+                <Pressable style={[styles.itemAction, styles.itemAction1, {borderColor: Colors.purple, backgroundColor: isPressFlash? Colors.purple : 'rgba(0,0,0,0)'}]}
+                           onPressOut={()=>{
+                             setIsPressFlash(false)
+                             setCurrentCardIndex(prevCardIndex => prevCardIndex - 1);
+                           }}
+                           onPressIn={()=>{
+                             setIsPressFlash(true)
+                           }}
+                >
+                  <Fontisto name={'flash'} size={30} color={!isPressFlash? Colors.purple : 'white'}/>
+                </Pressable>
+              </Animated.View>
+            </Animated.View>
           </Animated.View>
         );
       }
     }).reverse();
   };
-  //
-  // const nextImage = () =>{
-  //   if (indexImage>= data[currentCardIndex].avatar.length -1) return;
-  //   setIndexImage(prevIndexImage => prevIndexImage + 1)
-  // }
-  //
-  // const prevImage = () =>{
-  //   if (indexImage <= 0) return;
-  //   setIndexImage(prevIndexImage => prevIndexImage - 1)
-  // }
+
+  const nextImage = () =>{
+    if (indexImage>= data[currentCardIndex].avatar.length -1) return;
+    setIndexImage(prevIndexImage => prevIndexImage + 1)
+  }
+
+  const prevImage = () =>{
+    if (indexImage <= 0) return;
+    setIndexImage(prevIndexImage => prevIndexImage - 1)
+  }
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
