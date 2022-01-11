@@ -9,15 +9,16 @@
 import React from 'react';
 import type {Node} from 'react';
 import {
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
-import SwipeDeck from './src/screen/SwipeDeck'
+  Image,
+  SafeAreaView, Text, View,
+} from "react-native";
+import Router from './src/routes'
+import { Images } from "./src/assets/Images";
 
 const App: () => Node = () => {
   return (
     <SafeAreaView style={{flex:1}}>
-      <SwipeDeck/>
+      <Router/>
     </SafeAreaView>
   );
 };
