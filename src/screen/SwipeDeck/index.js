@@ -155,7 +155,6 @@ export default function SwipeDeck() {
         let cardAnimationStyle = {};
         let likeTextAnimation = {};
         let nopeTextAnimation = {};
-        let actionNope = {};
         const isActiveCard = i === currentCardIndex;
         if (isActiveCard) {
           cardAnimationStyle = {
